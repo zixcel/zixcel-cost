@@ -11,11 +11,11 @@ Calculate an inference-cost estimate from explicit usage and price inputs.
 
 Prices and usage are caller inputs. The package does not retrieve prices, bill an account or purchase capacity.
 
-Package distribution is not activated by this documentation. Use the checked-in source and the declared dependency versions; published availability must be verified separately.
+This is the reviewed first-publication candidate for `zixcel-inference-cost` 0.10.0. Published availability must be verified separately; this documentation does not claim the release is complete.
 
 ## Getting started
 
-Install Rust 1.97 or newer and make the declared dependencies available. Use the configured private registry when a dependency is not distributed publicly. Run from this repository:
+Install Rust 1.97 or newer and make the declared dependencies available. The reviewed crate uses crates.io dependencies. Run from this repository:
 
 ```sh
 cargo test --locked

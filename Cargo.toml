@@ -1,5 +1,5 @@
 [package]
-exclude = ["*.tgz", "**/*.tgz", "/registration/**", "/state/**", "/.local/**", "/.state/**", "/.data/**", "/secrets/**", "/credentials/**", "/.env", "/.env.production", "/.env.local", "/*.tgz", "/*.tar.gz", "/*.tar", "/*.zip", "/*.whl", "/*.crate", "/.ruff_cache/**", "/.mypy_cache/**", "/.tox/**", "/.nox/**", "/.hypothesis/**", "/.coverage", "/.coverage.*", "/htmlcov/**", "/lcov.info", "/junit.xml", "/*.profraw", "/*.profdata", "/*.egg-info/**", "/target/**", "/node_modules/**", "/dist/**", "/build/**", "/.cache/**", "/.pytest_cache/**", "/coverage/**"]
+include = ["/src/**", "/tests/**", "/examples/**", "/docs/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/schemas/**"]
 name = "zixcel-inference-cost"
 version = "0.10.0"
 edition = "2024"
@@ -10,7 +10,7 @@ readme = "README.md"
 repository = "https://github.com/zixcel/zixcel-inference-cost"
 homepage = "https://github.com/zixcel/zixcel-inference-cost"
 documentation = "https://docs.rs/zixcel-inference-cost"
-publish = ["zixcel-private"]
+publish = ["crates-io"]
 
 [package.metadata.zixcel]
 boundary = "inference-usage-and-cost"
