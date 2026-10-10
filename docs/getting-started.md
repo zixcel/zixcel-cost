@@ -1,4 +1,4 @@
-# Using zixcel-inference-cost
+# Using zixcel-cost
 
 Calculate an inference-cost estimate from explicit usage and price inputs.
 

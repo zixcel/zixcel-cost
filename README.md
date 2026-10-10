@@ -1,48 +1,50 @@
-# zixcel-inference-cost
+# zixcel-cost
 
-Calculate an inference-cost estimate from explicit usage and price inputs.
+Deterministic integer arithmetic for cost estimates and provider-neutral inference usage accounting. Use the shared arithmetic module for scaled quantities and checked totals, or the token API for a supplied usage record and rate card.
 
-## What you can do
+## Install
 
-- Validate supplied usage and rates.
-- Return reproducible calculated costs.
-
-## Current scope
-
-Prices and usage are caller inputs. The package does not retrieve prices, bill an account or purchase capacity.
-
-Package distribution is not activated by this documentation. Use the checked-in source and the declared dependency versions; published availability must be verified separately.
-
-## Getting started
-
-Install Rust 1.97 or newer and make the declared dependencies available. Use the configured private registry when a dependency is not distributed publicly. Run from this repository:
-
-```sh
-cargo test --locked
+```toml
+[dependencies]
+zixcel-cost = "0.10.0"
 ```
 
-## Examples and interface details
+This dependency uses crates.io; no private registry is required.
 
-## Usage
+## Capabilities
+
+- Calculate scaled resource costs with explicit rounding.
+- Validate token usage and estimate cached, uncached, output and reasoning costs.
+- Preserve reproducible minor-unit totals and estimate digests.
+
+## Example
 
 ```rust
-use zixcel_inference_cost::{CostRateCard, TokenUsage, estimate};
+use zixcel_cost::arithmetic::{Rounding, scaled_cost, sum_costs};
 
-let usage = TokenUsage::new(1_000, 200, 0, 120, 40)?;
-let rates = CostRateCard::per_token("micro-unit", "model-rate", "2026-09-04", 2, 1, 3, 4, 5);
-let result = estimate(&usage, &rates)?;
-// 800 uncached input × 2 + 200 cached × 1 + 120 output × 4 + 40 reasoning × 5.
-assert_eq!(result.total_micro_units(), 2_480);
-# Ok::<(), zixcel_inference_cost::CostError>(())
+assert_eq!(scaled_cost(1500, 3, 1000, Rounding::HalfUp)?, 5);
+assert_eq!(sum_costs([1600, 200, 480, 200])?, 2480);
+# Ok::<(), zixcel_cost::arithmetic::ArithmeticError>(())
 ```
 
-The rates are informational estimates and must not silently control model
-selection. Provider billing remains authoritative at the provider boundary.
+## Features and requirements
 
-## Documentation and source
+Requires Rust 1.97 or newer. The crate is a reusable library, not a command-line application.
 
-[Interface reference](docs/interface-reference.md)
+## Boundaries
 
-[Usage guide](docs/getting-started.md)
+The caller supplies prices, currency or unit conventions, usage and rounding rules. This crate does not fetch rates, convert currencies, perform billing or select a model; provider invoices remain authoritative.
 
-[Schemas](schemas) · [Implementation and public interfaces](src) · [Verification cases](tests) · [Contributing](CONTRIBUTING.md) · [Security reporting](SECURITY.md) · [License](LICENSE) · [Attribution notices](NOTICE)
+## Development
+
+```sh
+cargo fmt --all -- --check
+cargo test --locked --all-features
+cargo clippy --locked --all-targets --all-features -- -D warnings
+```
+
+## Documentation and license
+
+[API documentation](https://docs.rs/zixcel-cost) · [Source](https://github.com/zixcel/zixcel-cost) · [Usage guide](https://github.com/zixcel/zixcel-cost/blob/main/docs/getting-started.md)
+
+Apache-2.0. Retain the package LICENSE and NOTICE; see the source repository for security reporting and contribution guidelines.
