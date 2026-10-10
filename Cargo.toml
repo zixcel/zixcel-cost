@@ -1,19 +1,19 @@
 [package]
 exclude = ["*.tgz", "**/*.tgz", "/registration/**", "/state/**", "/.local/**", "/.state/**", "/.data/**", "/secrets/**", "/credentials/**", "/.env", "/.env.production", "/.env.local", "/*.tgz", "/*.tar.gz", "/*.tar", "/*.zip", "/*.whl", "/*.crate", "/.ruff_cache/**", "/.mypy_cache/**", "/.tox/**", "/.nox/**", "/.hypothesis/**", "/.coverage", "/.coverage.*", "/htmlcov/**", "/lcov.info", "/junit.xml", "/*.profraw", "/*.profdata", "/*.egg-info/**", "/target/**", "/node_modules/**", "/dist/**", "/build/**", "/.cache/**", "/.pytest_cache/**", "/coverage/**"]
-name = "zixcel-inference-cost"
+name = "zixcel-cost"
 version = "0.10.0"
 edition = "2024"
 rust-version = "1.97"
-description = "Provider-neutral deterministic inference usage and cost estimation"
+description = "Shared deterministic integer cost arithmetic and inference accounting"
 license = "Apache-2.0"
-readme = "README.md"
-repository = "https://github.com/zixcel/zixcel-inference-cost"
-homepage = "https://github.com/zixcel/zixcel-inference-cost"
-documentation = "https://docs.rs/zixcel-inference-cost"
-publish = ["zixcel-private"]
+readme = "README.crate.md"
+repository = "https://github.com/zixcel/zixcel-cost"
+homepage = "https://github.com/zixcel/zixcel-cost"
+documentation = "https://docs.rs/zixcel-cost"
+publish = ["crates-io"]
 
 [package.metadata.zixcel]
-boundary = "inference-usage-and-cost"
+boundary = "shared-cost-arithmetic"
 external_actions = false
 network_transport_owner = "crowsi"
 
