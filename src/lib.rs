@@ -5,6 +5,7 @@
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 pub mod arithmetic;
+pub mod billing;
 mod error;
 mod estimate;
 mod rate_card;

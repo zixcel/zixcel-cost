@@ -16,6 +16,9 @@ This dependency uses crates.io; no private registry is required.
 - Calculate scaled resource costs with explicit rounding.
 - Validate token usage and estimate cached, uncached, output and reasoning costs.
 - Preserve reproducible minor-unit totals and estimate digests.
+- Evaluate complete, source-linked invoice observations with exact decimal amounts and explicit freshness/threshold policy (new source API; not in published 0.10.0).
+
+[Invoice observations and example](docs/billing-observations.md) · [Responsibility and source completion](RESPONSIBILITY.md)
 
 ## Example
 
