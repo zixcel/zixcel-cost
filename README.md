@@ -16,6 +16,10 @@ This dependency uses crates.io; no private registry is required.
 - Calculate scaled resource costs with explicit rounding.
 - Validate token usage and estimate cached, uncached, output and reasoning costs.
 - Preserve reproducible minor-unit totals and estimate digests.
+- Bound observation sessions with explicit lifetime/count/revision limits, stop and immutable correction checks.
+- Evaluate complete, source-linked invoice observations with exact decimal amounts and explicit freshness/threshold policy (new source API; not in published 0.10.0).
+
+[Invoice observations and example](docs/billing-observations.md) · [Responsibility and source completion](RESPONSIBILITY.md)
 
 ## Example
 
@@ -48,3 +52,5 @@ cargo clippy --locked --all-targets --all-features -- -D warnings
 [API documentation](https://docs.rs/zixcel-cost) · [Source](https://github.com/zixcel/zixcel-cost) · [Usage guide](https://github.com/zixcel/zixcel-cost/blob/main/docs/getting-started.md)
 
 Apache-2.0. Retain the package LICENSE and NOTICE; see the source repository for security reporting and contribution guidelines.
+
+[OSS responsibility and source completion](docs/oss-source-contract.md) defines the supported package boundary and required acceptance. It does not declare unexecuted source, distribution or production checks complete.
