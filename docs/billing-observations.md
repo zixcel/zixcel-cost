@@ -26,3 +26,9 @@ assert!(!result.threshold_reached);
 Tests use synthetic accounts/invoices only. Source availability does not mean these new APIs exist in the currently published 0.10.0 archive. Adopt the next reviewed release or an explicitly fixed source revision after verifying its license and dependency lock.
 
 Use `Money::from_decimal` for exact decimal/scientific strings retained by provider report adapters. It accepts JSON numeric syntax and checked i128 arithmetic, rejects unsupported precision/overflow and never passes through a float. Invoice normalization must select the actual amount/currency/period/revision fields; a cost query, account linkage or raw TSV report is not automatically an invoice.
+
+## Bounded observation sessions
+
+`BillingMonitor` binds provider/account/period/threshold once, with explicit `MonitorLimits`: at most 24-hour lifetime, 128 accepted observations and 4096 retained invoice revision entries. It validates freshness and complete scope before updating state. Repeated/reordered current observations are not cumulatively added; each total comes from that complete snapshot. Immutable revision content cannot change, and a previously superseded revision cannot silently become current again. Opaque provider revision names are never sorted to invent a chronology; the collector still selects the authoritative current revision.
+
+`stop`, expiry and backwards session clocks close the session; an older clock cannot reactivate it. Exhausting the observation budget stops it. Capacity, partial input, scope substitution and stale data do not partially publish a new observation. This is an in-memory pure state machine, not a polling daemon, credential authority or payment scheduler. Each external acquisition/write still uses its own approved provider operation. Products own polling/notifications and use managed revision storage for persistence when needed.

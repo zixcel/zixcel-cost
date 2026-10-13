@@ -2,9 +2,14 @@
 mod decimal;
 mod money;
 mod monitor;
+mod session;
+mod session_models;
+mod session_observe;
 mod snapshot;
 pub use money::Money;
 pub use monitor::{MonitorResult, evaluate_threshold};
+pub use session::BillingMonitor;
+pub use session_models::{BillingScope, MonitorEvent, MonitorLimits};
 pub use snapshot::{BillingSnapshot, InvoiceObservation};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -15,6 +20,10 @@ pub enum BillingError {
     InvalidObservation,
     DuplicateInvoice,
     StaleObservation,
+    MonitorInactive,
+    MonitorCapacity,
+    InconsistentRevision,
+    RevisionRollback,
 }
 
 impl std::fmt::Display for BillingError {
@@ -25,6 +34,10 @@ impl std::fmt::Display for BillingError {
             Self::Overflow => "billing arithmetic overflow",
             Self::InvalidObservation => "invalid or incomplete billing observation",
             Self::DuplicateInvoice => "duplicate invoice identity",
+            Self::MonitorInactive => "billing monitor is stopped or expired",
+            Self::MonitorCapacity => "billing monitor revision capacity exceeded",
+            Self::RevisionRollback => "previously superseded invoice revision returned",
+            Self::InconsistentRevision => "invoice revision content changed",
             Self::StaleObservation => "stale or future billing observation",
         })
     }
