@@ -105,3 +105,34 @@ fn only_complete_empty_snapshot_is_known_zero() {
     value.complete = false;
     assert!(evaluate_threshold(&value, &money(1, 0, "JPY"), 350, 100).is_err());
 }
+
+#[test]
+fn source_decimal_lexemes_never_pass_through_floating_point() {
+    assert_eq!(
+        Money::from_decimal("12345678901234567890.123", "USD".into()).unwrap(),
+        money(12_345_678_901_234_567_890_123, 3, "USD")
+    );
+    assert_eq!(
+        Money::from_decimal("-1.25e+2", "USD".into()).unwrap(),
+        money(-125, 0, "USD")
+    );
+    assert_eq!(
+        Money::from_decimal("1.25e-2", "USD".into()).unwrap(),
+        money(125, 4, "USD")
+    );
+    assert_eq!(
+        Money::from_decimal("-170141183460469231731687303715884105728", "USD".into())
+            .unwrap()
+            .coefficient(),
+        i128::MIN
+    );
+    for input in [
+        "", " 1", "+1", "01", ".1", "1.", "1e", "1e1e1", "1e-10", "NaN",
+    ] {
+        assert!(Money::from_decimal(input, "USD".into()).is_err(), "{input}");
+    }
+    assert_eq!(
+        Money::from_decimal("1e1000", "USD".into()),
+        Err(BillingError::Overflow)
+    );
+}

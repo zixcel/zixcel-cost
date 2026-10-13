@@ -1,4 +1,5 @@
 //! Provider-neutral invoice observations and exact arithmetic. No account access or payment execution.
+mod decimal;
 mod money;
 mod monitor;
 mod snapshot;

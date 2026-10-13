@@ -24,3 +24,5 @@ assert!(!result.threshold_reached);
 ```
 
 Tests use synthetic accounts/invoices only. Source availability does not mean these new APIs exist in the currently published 0.10.0 archive. Adopt the next reviewed release or an explicitly fixed source revision after verifying its license and dependency lock.
+
+Use `Money::from_decimal` for exact decimal/scientific strings retained by provider report adapters. It accepts JSON numeric syntax and checked i128 arithmetic, rejects unsupported precision/overflow and never passes through a float. Invoice normalization must select the actual amount/currency/period/revision fields; a cost query, account linkage or raw TSV report is not automatically an invoice.
