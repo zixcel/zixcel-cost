@@ -44,7 +44,13 @@ fn digest_json<T: Serialize>(value: &T) -> String {
     let bytes = serde_json::to_vec(value).unwrap_or_default();
     let mut digest = Sha256::new();
     digest.update(bytes);
-    format!("{:x}", digest.finalize())
+    (digest.finalize())
+        .iter()
+        .fold(String::with_capacity(64), |mut encoded, byte| {
+            use std::fmt::Write as _;
+            write!(encoded, "{byte:02x}").expect("writing to String cannot fail");
+            encoded
+        })
 }
 
 #[cfg(test)]
