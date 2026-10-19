@@ -3,7 +3,13 @@ use sha2::{Digest, Sha256};
 
 fn hash<T: serde::Serialize>(value: &T) -> Result<String, BillingError> {
     let bytes = serde_json::to_vec(value).map_err(|_| BillingError::InvalidObservation)?;
-    Ok(format!("{:x}", Sha256::digest(bytes)))
+    Ok((Sha256::digest(bytes))
+        .iter()
+        .fold(String::with_capacity(64), |mut encoded, byte| {
+            use std::fmt::Write as _;
+            write!(encoded, "{byte:02x}").expect("writing to String cannot fail");
+            encoded
+        }))
 }
 impl BillingMonitor {
     /// Apply one complete fresh observation at the exact configured scope.
