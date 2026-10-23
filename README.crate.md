@@ -6,7 +6,7 @@ Deterministic integer arithmetic for cost estimates and provider-neutral inferen
 
 ```toml
 [dependencies]
-zixcel-cost = "0.10.0"
+zixcel-cost = "0.11.0"
 ```
 
 This dependency uses crates.io; no private registry is required.
@@ -48,3 +48,5 @@ cargo clippy --locked --all-targets --all-features -- -D warnings
 [API documentation](https://docs.rs/zixcel-cost) · [Source](https://github.com/zixcel/zixcel-cost) · [Usage guide](https://github.com/zixcel/zixcel-cost/blob/main/docs/getting-started.md)
 
 Apache-2.0. Retain the package LICENSE and NOTICE; see the source repository for security reporting and contribution guidelines.
+
+Usage exports use `UsageSnapshot` / `UsageMonitor` separately from issued invoices. Both reuse the same checked totals and bounded revision engine. See [billing observations](docs/billing-observations.md).
