@@ -6,7 +6,7 @@ Deterministic integer arithmetic for cost estimates and provider-neutral inferen
 
 ```toml
 [dependencies]
-zixcel-cost = "0.10.0"
+zixcel-cost = "0.11.0"
 ```
 
 This dependency uses crates.io; no private registry is required.
@@ -17,7 +17,7 @@ This dependency uses crates.io; no private registry is required.
 - Validate token usage and estimate cached, uncached, output and reasoning costs.
 - Preserve reproducible minor-unit totals and estimate digests.
 - Bound observation sessions with explicit lifetime/count/revision limits, stop and immutable correction checks.
-- Evaluate complete, source-linked invoice observations with exact decimal amounts and explicit freshness/threshold policy (new source API; not in published 0.10.0).
+- Evaluate complete, source-linked invoice observations with exact decimal amounts and explicit freshness/threshold policy (0.11.0 source candidate; publication is separately verified).
 
 [Invoice observations and example](docs/billing-observations.md) · [Responsibility and source completion](RESPONSIBILITY.md)
 
@@ -57,3 +57,5 @@ Apache-2.0. Retain the package LICENSE and NOTICE; see the source repository for
 
 Dependency updates: [repository policy](docs/dependency-updates.md).
 Registry releases: [version tags and GitHub OIDC](docs/registry-release.md).
+
+Usage exports use `UsageSnapshot` / `UsageMonitor` separately from issued invoices. Both reuse the same checked totals and bounded revision engine. See [billing observations](docs/billing-observations.md).

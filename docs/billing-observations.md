@@ -32,3 +32,23 @@ Use `Money::from_decimal` for exact decimal/scientific strings retained by provi
 `BillingMonitor` binds provider/account/period/threshold once, with explicit `MonitorLimits`: at most 24-hour lifetime, 128 accepted observations and 4096 retained invoice revision entries. It validates freshness and complete scope before updating state. Repeated/reordered current observations are not cumulatively added; each total comes from that complete snapshot. Immutable revision content cannot change, and a previously superseded revision cannot silently become current again. Opaque provider revision names are never sorted to invent a chronology; the collector still selects the authoritative current revision.
 
 `stop`, expiry and backwards session clocks close the session; an older clock cannot reactivate it. Exhausting the observation budget stops it. Capacity, partial input, scope substitution and stale data do not partially publish a new observation. This is an in-memory pure state machine, not a polling daemon, credential authority or payment scheduler. Each external acquisition/write still uses its own approved provider operation. Products own polling/notifications and use managed revision storage for persistence when needed.
+
+## Usage exports
+
+`UsageSnapshot` / `UsageObservation` carry provider-normalized usage report totals,
+not issued invoices or payment evidence. `UsageMonitor` has its own typed entry
+point and session; it shares scope/freshness, checked totals, immutable revisions,
+capacity and commit logic with `BillingMonitor` without converting usage into
+`InvoiceObservation`. Do not add both kinds into a single account total.
+
+Provider owners decode vendor bytes and verify their scope, page completeness,
+source hashes and stable export revisions before producing a usage snapshot.
+A complete table page is not proof that a vendor exported every billed service.
+The report owner selects a period/currency and a reviewed source; later export
+adjustments are new revisions. The shared library knows no Google schemas or
+account credentials. Google-specific decoding and normalization belong in
+`zixcel-google`; its synthetic independent consumer must exercise the real
+byte decoder, not a manually fabricated shared snapshot.
+
+This 0.11.0 source candidate requires normal package publication acceptance.
+No upstream collection, paid SQL query, persistent poll or notification is added.

@@ -1,7 +1,9 @@
-use super::{BillingError, BillingMonitor, BillingSnapshot, MonitorEvent, evaluate_threshold};
+use super::{
+    BillingError, BillingMonitor, BillingSnapshot, MonitorEvent, MonitorResult, evaluate_threshold,
+};
 use sha2::{Digest, Sha256};
 
-fn hash<T: serde::Serialize>(value: &T) -> Result<String, BillingError> {
+pub(super) fn hash<T: serde::Serialize>(value: &T) -> Result<String, BillingError> {
     let bytes = serde_json::to_vec(value).map_err(|_| BillingError::InvalidObservation)?;
     Ok((Sha256::digest(bytes))
         .iter()
@@ -20,6 +22,32 @@ impl BillingMonitor {
         snapshot: &BillingSnapshot,
         now: u64,
     ) -> Result<MonitorEvent, BillingError> {
+        self.admit(
+            &snapshot.provider,
+            &snapshot.account,
+            snapshot.period_start_ms,
+            snapshot.period_end_ms,
+            snapshot.observed_at_ms,
+            now,
+        )?;
+        let evaluated =
+            evaluate_threshold(snapshot, &self.threshold, now, self.limits.maximum_age_ms)?;
+        let entries = snapshot
+            .invoices
+            .iter()
+            .map(|v| Ok(((v.invoice_id.clone(), v.revision.clone()), hash(v)?)))
+            .collect::<Result<_, BillingError>>()?;
+        self.commit(entries, evaluated, now)
+    }
+    pub(super) fn admit(
+        &mut self,
+        provider: &str,
+        account: &str,
+        start: u64,
+        end: u64,
+        observed: u64,
+        now: u64,
+    ) -> Result<(), BillingError> {
         if !self.active
             || now < self.started
             || now < self.last_checked_at
@@ -28,31 +56,35 @@ impl BillingMonitor {
             self.stop();
             return Err(BillingError::MonitorInactive);
         }
-        if snapshot.provider != self.scope.provider
-            || snapshot.account != self.scope.account
-            || snapshot.period_start_ms != self.scope.period_start_ms
-            || snapshot.period_end_ms != self.scope.period_end_ms
+        if provider != self.scope.provider
+            || account != self.scope.account
+            || start != self.scope.period_start_ms
+            || end != self.scope.period_end_ms
         {
             return Err(BillingError::InvalidObservation);
         }
         if self
             .last_observed_at
-            .is_some_and(|previous| snapshot.observed_at_ms < previous)
+            .is_some_and(|previous| observed < previous)
         {
             return Err(BillingError::StaleObservation);
         }
-        let evaluated =
-            evaluate_threshold(snapshot, &self.threshold, now, self.limits.maximum_age_ms)?;
+        Ok(())
+    }
+    pub(super) fn commit(
+        &mut self,
+        entries: Vec<((String, String), String)>,
+        evaluated: MonitorResult,
+        now: u64,
+    ) -> Result<MonitorEvent, BillingError> {
         let mut current = std::collections::BTreeMap::new();
         let mut new_entries = 0;
-        for invoice in &snapshot.invoices {
-            let key = (invoice.invoice_id.clone(), invoice.revision.clone());
-            let content = hash(invoice)?;
+        for (key, content) in entries {
             if self.revisions.contains_key(&key)
                 && self
                     .latest_revisions
-                    .get(&invoice.invoice_id)
-                    .is_some_and(|latest| latest != &invoice.revision)
+                    .get(&key.0)
+                    .is_some_and(|latest| latest != &key.1)
             {
                 return Err(BillingError::RevisionRollback);
             }
@@ -70,13 +102,12 @@ impl BillingMonitor {
         }
         let fingerprint = hash(&current.iter().collect::<Vec<_>>())?;
         let changed = self.last_content.as_ref() != Some(&fingerprint);
-        for invoice in &snapshot.invoices {
-            self.latest_revisions
-                .insert(invoice.invoice_id.clone(), invoice.revision.clone());
+        for (id, revision) in current.keys() {
+            self.latest_revisions.insert(id.clone(), revision.clone());
         }
         self.revisions.extend(current);
         self.last_content = Some(fingerprint);
-        self.last_observed_at = Some(snapshot.observed_at_ms);
+        self.last_observed_at = Some(evaluated.observed_at_ms);
         self.last_checked_at = now;
         self.count += 1;
         if self.count == self.limits.maximum_observations {
